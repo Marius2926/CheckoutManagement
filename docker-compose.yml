@@ -1,0 +1,24 @@
+services:
+  checkout-db:
+    image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+    container_name: checkout-db
+    environment:
+      SA_PASSWORD: "P@ssW0rd!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - 1434:1433 # exposed just for debugging purposes
+
+  checkout-api:
+    build:
+      context: .
+      dockerfile: ./CheckoutManagement.Api/Dockerfile
+    image: checkout-api
+    container_name: checkout-api
+    ports:
+      - 5200:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ASPNETCORE_URLS=http://+:80"
+    restart: on-failure
+    depends_on:
+      - checkout-db
